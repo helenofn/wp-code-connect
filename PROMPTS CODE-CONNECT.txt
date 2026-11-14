@@ -1,0 +1,6 @@
+PROMPTS CODE-CONNECT
+Crie um workspace usando pnpm workspaces. Dentro dele, teremos dois apps:
+Um app React usando Vite (use o npx pra gerar esse projeto do zero)
+Um app NestJS (use também npx para gerar esse projeto)
+Na raiz, crie atalhos no package.json para podermos executar comandos em cada app sem precisar trocar para diretórios internos
+ 
