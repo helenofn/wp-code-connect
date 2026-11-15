@@ -4,6 +4,8 @@ import { SocialLoginButton } from '../../molecules/SocialLoginButton/SocialLogin
 export interface SocialProvider {
   name: string
   icon: string
+  iconWidth: number
+  iconHeight: number
   onClick?: () => void
 }
 
@@ -17,14 +19,16 @@ export function SocialLogin({
   dividerText = 'ou entre com outras contas',
 }: SocialLoginProps) {
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-2">
       <Divider>{dividerText}</Divider>
-      <div className="flex justify-center gap-10">
+      <div className="flex items-center justify-center gap-6">
         {providers.map((provider) => (
           <SocialLoginButton
             key={provider.name}
             name={provider.name}
             icon={provider.icon}
+            iconWidth={provider.iconWidth}
+            iconHeight={provider.iconHeight}
             onClick={provider.onClick}
           />
         ))}

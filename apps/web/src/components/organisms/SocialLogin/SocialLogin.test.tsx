@@ -8,8 +8,8 @@ describe('SocialLogin', () => {
     render(
       <SocialLogin
         providers={[
-          { name: 'Github', icon: '/github.png' },
-          { name: 'Gmail', icon: '/gmail.png' },
+          { name: 'Github', icon: '/github.svg', iconWidth: 33, iconHeight: 32 },
+          { name: 'Gmail', icon: '/gmail.svg', iconWidth: 28, iconHeight: 28 },
         ]}
       />,
     )
@@ -21,7 +21,7 @@ describe('SocialLogin', () => {
   it('triggers the provider callback when its button is pressed', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()
-    render(<SocialLogin providers={[{ name: 'Github', icon: '/github.png', onClick }]} />)
+    render(<SocialLogin providers={[{ name: 'Github', icon: '/github.svg', iconWidth: 33, iconHeight: 32, onClick }]} />)
     await user.click(screen.getByRole('button', { name: 'Github' }))
     expect(onClick).toHaveBeenCalledTimes(1)
   })

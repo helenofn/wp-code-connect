@@ -3,7 +3,7 @@ import { Icon } from './Icon'
 
 describe('Icon', () => {
   it('renders a decorative svg hidden from assistive tech', () => {
-    const { container } = render(<Icon name="arrow-right" />)
+    const { container } = render(<Icon name="arrow-forward" />)
     const svg = container.querySelector('svg')
     expect(svg).toBeInTheDocument()
     expect(svg).toHaveAttribute('aria-hidden', 'true')

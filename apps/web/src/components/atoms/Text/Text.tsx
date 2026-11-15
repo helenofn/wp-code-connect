@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
 
 interface TextProps {
-  variant?: 'lead' | 'muted'
+  variant?: 'lead' | 'body' | 'small'
   children: ReactNode
 }
 
 const variants = {
-  lead: 'text-lg text-offwhite',
-  muted: 'text-sm text-muted',
+  lead: 'text-2xl/normal text-offwhite',
+  body: 'text-lg/normal text-offwhite',
+  small: 'text-base/normal text-offwhite',
 }
 
 export function Text({ variant = 'lead', children }: TextProps) {

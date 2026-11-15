@@ -10,7 +10,11 @@ describe('RememberForgotRow', () => {
     const onCheckedChange = vi.fn()
     render(
       <MemoryRouter>
-        <RememberForgotRow checked={false} onCheckedChange={onCheckedChange} />
+        <RememberForgotRow
+          checked={false}
+          onCheckedChange={onCheckedChange}
+          forgotPasswordTo="/esqueci-senha"
+        />
       </MemoryRouter>,
     )
 
@@ -20,5 +24,11 @@ describe('RememberForgotRow', () => {
       'href',
       '/esqueci-senha',
     )
+  })
+
+  it('hides the password recovery link when no route is given', () => {
+    render(<RememberForgotRow checked={false} onCheckedChange={vi.fn()} />)
+    expect(screen.getByRole('checkbox', { name: 'Lembrar-me' })).toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 })

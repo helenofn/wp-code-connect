@@ -8,8 +8,8 @@ interface LinkProps {
 }
 
 const variants = {
-  underline: 'text-sm text-offwhite underline underline-offset-4',
-  accent: 'font-medium text-primary',
+  underline: 'text-base/normal text-offwhite underline',
+  accent: 'flex items-center gap-3 text-lg/normal text-verde-destaque',
 }
 
 export function Link({ to, variant = 'underline', children }: LinkProps) {

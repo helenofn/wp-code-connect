@@ -3,17 +3,17 @@
 @theme {
   --font-sans: "Prompt", ui-sans-serif, system-ui, sans-serif;
 
-  --color-page: #00090e;
-  --color-surface: #171d1f;
-  --color-field: #888888;
+  /* Paleta do projeto (nomes conforme os estilos de cor do Figma) */
+  --color-grafite: #00090e;
+  --color-cinza-escuro: #171d1f;
+  --color-cinza-medio: #888888;
   --color-offwhite: #e1e1e1;
-  --color-muted: #bcbcbc;
-  --color-primary: #81fe88;
-  --color-ink: #132e35;
+  --color-verde-destaque: #81fe88;
+  --color-verde-petroleo: #132e35;
 }
 
 @layer base {
   body {
-    @apply bg-page font-sans text-offwhite antialiased;
+    @apply bg-grafite font-sans text-offwhite antialiased;
   }
 }

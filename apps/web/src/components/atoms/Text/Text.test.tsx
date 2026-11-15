@@ -7,8 +7,8 @@ describe('Text', () => {
     expect(screen.getByText('Boas-vindas! Faça seu login.').tagName).toBe('P')
   })
 
-  it('applies the muted variant', () => {
-    render(<Text variant="muted">Lembrar-me</Text>)
-    expect(screen.getByText('Lembrar-me')).toHaveClass('text-muted')
+  it('applies the small variant', () => {
+    render(<Text variant="small">Ainda não tem conta?</Text>)
+    expect(screen.getByText('Ainda não tem conta?')).toHaveClass('text-base/normal')
   })
 })

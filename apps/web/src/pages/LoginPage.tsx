@@ -2,6 +2,7 @@ import { AuthFooterCta } from '../components/organisms/AuthFooterCta/AuthFooterC
 import { LoginForm, type LoginValues } from '../components/organisms/LoginForm/LoginForm'
 import { SocialLogin } from '../components/organisms/SocialLogin/SocialLogin'
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout'
+import { socialProviders } from './socialProviders'
 
 export function LoginPage() {
   // Integração com a API ainda não existe: o envio apenas registra os dados.
@@ -10,19 +11,22 @@ export function LoginPage() {
   }
 
   return (
-    <AuthLayout bannerSrc="/banner-login.png" bannerAlt="Code Connect">
+    <AuthLayout
+      bannerSrc="/banners/login.webp"
+      bannerAlt="Pessoa sorrindo enquanto programa no notebook"
+      bannerPosition="object-[51%_center]"
+      footer={
+        <AuthFooterCta
+          question="Ainda não tem conta?"
+          linkLabel="Crie seu cadastro!"
+          to="/cadastro"
+          icon="assignment"
+        />
+      }
+    >
+      <title>Login | Code Connect</title>
       <LoginForm onSubmit={handleLogin} />
-      <SocialLogin
-        providers={[
-          { name: 'Github', icon: '/github.png', onClick: () => console.info('github login') },
-          { name: 'Gmail', icon: '/gmail.png', onClick: () => console.info('gmail login') },
-        ]}
-      />
-      <AuthFooterCta
-        question="Ainda não tem conta?"
-        linkLabel="Crie seu cadastro!"
-        to="/cadastro"
-      />
+      <SocialLogin providers={socialProviders} />
     </AuthLayout>
   )
 }

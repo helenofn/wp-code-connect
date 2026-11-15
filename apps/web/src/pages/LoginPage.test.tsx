@@ -9,6 +9,7 @@ describe('LoginPage', () => {
         <LoginPage />
       </MemoryRouter>,
     )
+    expect(document.title).toBe('Login | Code Connect')
     expect(screen.getByRole('heading', { level: 1, name: 'Login' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Github' })).toBeInTheDocument()
