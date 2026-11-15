@@ -12,6 +12,7 @@
     "build:api": "pnpm --filter api build",
     "lint": "pnpm -r run lint",
     "test:api": "pnpm --filter api test",
-    "test:web": "pnpm --filter web test"
+    "test:web": "pnpm --filter web test",
+    "test:a11y": "pnpm --filter web test:a11y"
   }
 }
