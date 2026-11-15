@@ -9,8 +9,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `apps/web` — React 19 + Vite 8 + TypeScript SPA (package name `web`)
 - `apps/api` — NestJS 12 HTTP API on Express (package name `api`), listens on `PORT` or 3000
 
-Both were generated from their official scaffolds and are still close to the starter templates. There is no shared package yet, and the web app doesn't call the API yet (no Vite proxy is configured).
-
 ## Commands
 
 Run everything from the repo root; the root `package.json` provides shortcuts so you don't have to `cd` into an app.
@@ -44,6 +42,10 @@ pnpm api test -t "should return"
 
 - **Atomic Design.** Components live under `src/components/` in `atoms/`, `molecules/`, `organisms/` and `templates/`, and routed screens live in `src/pages/`. A component may only import from its own level or lower levels: atoms import no other components, molecules compose atoms, and so on. Pages compose templates and organisms and hold data fetching and state. Lower levels stay presentational and get their data through props.
 - **Tailwind CSS** handles all styling, using utility classes in JSX. Don't add new `.css` files or CSS modules for component styles. The leftover template CSS (`App.css`, most of `index.css`) gets replaced by Tailwind as screens are rebuilt. Put repeated design values (colors, spacing, fonts) in the Tailwind theme rather than hard-coding them.
+- **No arbitrary values in classes.** Don't write hex colors or pixel sizes inside class names (`text-[#e1e1e1]`, `text-[31px]`, `w-[407px]`, `rounded-[32px]`).
+  - **Colors** come from the project palette, defined in the `@theme` block of `src/index.css`. Its names follow the color styles in Figma: `grafite` `#00090E` (page background), `cinza-escuro` `#171D1F` (card and input text), `cinza-medio` `#888888` (input background and borders), `offwhite` `#E1E1E1` (text), `verde-destaque` `#81FE88` (primary actions and links) and `verde-petroleo` `#132E35` (text on primary buttons). Use them as `bg-grafite`, `text-verde-destaque` and so on. When a design brings a new color, add it to the palette as `--color-<name>`, using the Figma style name in kebab-case, and don't hard-code it.
+  - **Sizes** (font sizes, widths, heights, spacing and radius) use Tailwind's default tokens. When a Figma value isn't on the scale, round to the nearest token and don't add a custom one. For a tie, round up. Font sizes map as 31px → `text-3xl`, 22px → `text-2xl`, 18px → `text-lg`, 15px → `text-base` and 12.5px → `text-xs`. Add `/normal` (`text-lg/normal`) to keep the 1.5 line height used in Figma. The spacing scale is any multiple of 4px, so use `w-102` (408px), `size-4.5` (18px) or `left-8.5` (34px) rather than a bracketed pixel value.
+  - The only accepted exception is a value that no Tailwind token can express and that isn't a size or a color, such as the banner crop `object-[51%_center]`.
 - **Every component ships with a test** that covers its essential use: it renders with typical props, and its main interaction or variant works. The test sits next to the component as `ComponentName.test.tsx`. Use Vitest + React Testing Library, and query by role or label rather than by class names. A component without a test is unfinished work.
 - Tailwind and the test stack aren't installed yet. Set them up before writing the first component: `tailwindcss` with `@tailwindcss/vite`, plus `vitest`, `@testing-library/react`, `@testing-library/user-event` and `jsdom`, and a `test` script in `apps/web/package.json`. Then add a `test:web` shortcut to the root `package.json`.
 
@@ -71,6 +73,22 @@ Commit messages in both apps follow [Conventional Commits](https://www.conventio
 - Scope is the app or area: `web`, `api`, or `root` for workspace-level changes (e.g. `feat(web): add Button atom`, `fix(api): return 404 for missing user`).
 - Description: imperative mood, lowercase, no trailing period. Mark breaking changes with `!` after the type/scope and/or a `BREAKING CHANGE:` footer.
 - Keep each commit to one app when possible. Split changes that touch both apps unless they really belong together.
+
+Allowed `type`s:
+
+| Type      | When to use                                      |
+| --------- | ------------------------------------------------ |
+| `feat`    | New feature                                      |
+| `fix`     | Bug fix                                          |
+| `docs`    | Documentation only                               |
+| `style`   | Formatting, no logic change                      |
+| `refactor`| Code change that is neither a fix nor a feature  |
+| `test`    | Adding or updating tests                         |
+| `perf`    | Performance improvement                          |
+| `ci`      | CI/CD configuration                              |
+| `build`   | Build system or external dependency changes      |
+| `revert`  | Reverts a previous commit                        |
+| `chore`   | Maintenance, tooling, dependencies               |
 
 ## API conventions (from `apps/api/AGENTS.md`)
 
