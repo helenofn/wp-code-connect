@@ -30,4 +30,14 @@ describe('SignupForm', () => {
       remember: true,
     })
   })
+
+  it('disables the button while submitting', () => {
+    render(<SignupForm onSubmit={vi.fn()} submitting />)
+    expect(screen.getByRole('button', { name: 'Cadastrando...' })).toBeDisabled()
+  })
+
+  it('shows the error message', () => {
+    render(<SignupForm onSubmit={vi.fn()} error="Este email já está cadastrado." />)
+    expect(screen.getByRole('alert')).toHaveTextContent('Este email já está cadastrado.')
+  })
 })

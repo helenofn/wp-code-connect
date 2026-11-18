@@ -1,13 +1,30 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { AuthFooterCta } from '../components/organisms/AuthFooterCta/AuthFooterCta'
 import { LoginForm, type LoginValues } from '../components/organisms/LoginForm/LoginForm'
 import { SocialLogin } from '../components/organisms/SocialLogin/SocialLogin'
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout'
+import { login } from '../services/api/auth'
+import { getErrorMessage } from '../services/api/errors'
+import { saveToken } from '../services/api/tokenStorage'
 import { socialProviders } from './socialProviders'
 
 export function LoginPage() {
-  // Integração com a API ainda não existe: o envio apenas registra os dados.
-  function handleLogin(values: LoginValues) {
-    console.info('login', values)
+  const navigate = useNavigate()
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string>()
+
+  async function handleLogin({ email, password, remember }: LoginValues) {
+    setSubmitting(true)
+    setError(undefined)
+    try {
+      const { accessToken } = await login({ email, password })
+      saveToken(accessToken, remember)
+      navigate('/inicio')
+    } catch (err) {
+      setError(getErrorMessage(err))
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -25,7 +42,7 @@ export function LoginPage() {
       }
     >
       <title>Login | Code Connect</title>
-      <LoginForm onSubmit={handleLogin} />
+      <LoginForm onSubmit={handleLogin} submitting={submitting} error={error} />
       <SocialLogin providers={socialProviders} />
     </AuthLayout>
   )

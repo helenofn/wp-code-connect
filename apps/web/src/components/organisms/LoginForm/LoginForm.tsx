@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Alert } from '../../atoms/Alert/Alert'
 import { Button } from '../../atoms/Button/Button'
 import { Icon } from '../../atoms/Icon/Icon'
 import { AuthHeader } from '../../molecules/AuthHeader/AuthHeader'
@@ -6,23 +7,27 @@ import { FormField } from '../../molecules/FormField/FormField'
 import { RememberForgotRow } from '../../molecules/RememberForgotRow/RememberForgotRow'
 
 export interface LoginValues {
-  identifier: string
+  email: string
   password: string
   remember: boolean
 }
 
 interface LoginFormProps {
   onSubmit: (values: LoginValues) => void
+  /** Enquanto `true`, o botão fica desabilitado e indica o envio. */
+  submitting?: boolean
+  /** Mensagem de erro do último envio. */
+  error?: string
 }
 
-export function LoginForm({ onSubmit }: LoginFormProps) {
-  const [identifier, setIdentifier] = useState('')
+export function LoginForm({ onSubmit, submitting = false, error }: LoginFormProps) {
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onSubmit({ identifier, password, remember })
+    onSubmit({ email, password, remember })
   }
 
   return (
@@ -32,12 +37,13 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
           <FormField
-            label="Email ou usuário"
-            name="identifier"
-            placeholder="usuario123"
-            autoComplete="username"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="Digite seu email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <div className="flex flex-col gap-2">
             <FormField
@@ -56,8 +62,14 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
             />
           </div>
         </div>
-        <Button type="submit" icon={<Icon name="arrow-forward" className="size-4.5" />}>
-          Login
+        {error && <Alert>{error}</Alert>}
+        <Button
+          type="submit"
+          disabled={submitting}
+          aria-busy={submitting}
+          icon={<Icon name="arrow-forward" className="size-4.5" />}
+        >
+          {submitting ? 'Entrando...' : 'Login'}
         </Button>
       </form>
     </div>

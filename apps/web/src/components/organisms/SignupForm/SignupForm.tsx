@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Alert } from '../../atoms/Alert/Alert'
 import { Button } from '../../atoms/Button/Button'
 import { Icon } from '../../atoms/Icon/Icon'
 import { AuthHeader } from '../../molecules/AuthHeader/AuthHeader'
@@ -14,9 +15,13 @@ export interface SignupValues {
 
 interface SignupFormProps {
   onSubmit: (values: SignupValues) => void
+  /** Enquanto `true`, o botão fica desabilitado e indica o envio. */
+  submitting?: boolean
+  /** Mensagem de erro do último envio. */
+  error?: string
 }
 
-export function SignupForm({ onSubmit }: SignupFormProps) {
+export function SignupForm({ onSubmit, submitting = false, error }: SignupFormProps) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -63,8 +68,14 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
             <RememberForgotRow checked={remember} onCheckedChange={setRemember} />
           </div>
         </div>
-        <Button type="submit" icon={<Icon name="arrow-forward" className="size-4.5" />}>
-          Cadastrar
+        {error && <Alert>{error}</Alert>}
+        <Button
+          type="submit"
+          disabled={submitting}
+          aria-busy={submitting}
+          icon={<Icon name="arrow-forward" className="size-4.5" />}
+        >
+          {submitting ? 'Cadastrando...' : 'Cadastrar'}
         </Button>
       </form>
     </div>
