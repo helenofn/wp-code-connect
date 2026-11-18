@@ -35,6 +35,7 @@ Postgres runs from the root `docker-compose.yml`. Its data lives in the named vo
 ```bash
 pnpm db:up              # start postgres and wait until it's healthy
 pnpm db:migrate         # apply pending migrations (apps/api/drizzle/)
+pnpm db:seed            # mock users/posts/likes/comments (idempotent; login: any *@seed.codeconnect.dev / senha1234)
 pnpm db:down            # stop it; data is kept
 pnpm api db:generate --name <change>   # create a migration after editing the schema
 pnpm api db:studio      # browse the data

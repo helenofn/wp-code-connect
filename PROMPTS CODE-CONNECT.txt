@@ -1,6 +1,151 @@
 PROMPTS CODE-CONNECT
+
+FRONTEND (planejar com o modelo melhor e executar com o pior)
+
+###
+1
+###
 Crie um workspace usando pnpm workspaces. Dentro dele, teremos dois apps:
 Um app React usando Vite (use o npx pra gerar esse projeto do zero)
 Um app NestJS (use também npx para gerar esse projeto)
+
 Na raiz, crie atalhos no package.json para podermos executar comandos em cada app sem precisar trocar para diretórios internos
- 
+
+RESULTADO:
+Atalhos na raiz (package.json)
+
+Comando	O que faz
+pnpm dev	Sobe os dois apps juntos (web na porta 5173, api na porta 3000)
+pnpm dev:web / pnpm dev:api	Sobe só um dos apps
+pnpm build	Gera o build dos dois apps
+pnpm build:web / pnpm build:api	Gera o build de um app só
+pnpm lint	Roda o lint nos dois apps
+pnpm test:api	Roda os testes do NestJS
+pnpm web <cmd> / pnpm api <cmd>	Roda qualquer comando dentro de um app, sem trocar de diretório
+
+###
+2
+###
+Inicialize o git no projeto, e garanta que temos os respectivos .gitignore em cada app e que cada app não possua um repositório interno
+
+###
+3
+###
+/init
+
+###
+4
+###
+vamos incrementar o @CLAUDE.md  :
+
+no frontend, queremos usar atomic design, tailwind, e todo componente precisa ter um teste cobrindo o seu uso essencial.
+
+no backend: queremos seguir todas as regras para sermos aderentes aos principios REST.
+
+em relação ao git, para ambos os projetos, queremos usar conventional commits.
+
+###
+5 - TERMINAL - Define Opus 4.6 in plan mode, else Sonnet 4.6
+###
+/model opusplan
+
+###
+6 - Criando a pagina de login
+###
+desenvolva a página de login.
+
+pontos importantes:
+
+logos sociais: @apps/web/public/github.png  e @apps/web/public/gmail.png 
+
+banner principal: @apps/web/public/banner-login.png 
+
+Detalhes de implementação:
+
+- utilize atomic design para gerar os componentes 
+- a página de cadastro vai ter o mesmo layout base, porém o banner é diferente e o formulário possui campos diferentes. Não precisa implementar agora, mas já desenvolva pensando em reuso proximo.
+
+a imagem com o layout está em anexo.
+
+###
+7 - Pagina de cadastro
+###
+Já temos a pagina de login @apps/web/src/pages/LoginPage.tsx 
+
+agora queremos implementar o página de cadastro:
+https://www.figma.com/design/Wbb3Dr0vXQGAUT6v86kSp9/CodeConnect---Acervo---Fa%C3%A7a-uma-c%C3%B3pia---Community-?node-id=155-3484&t=LXU7QjifC3BmM9FL-4
+
+ atenção para reaproveitar o que foi criado já pensando nesse reuso
+
+o figma mcp está ativado e autenticado.
+
+faça ajustes finos se encontrar diferenças entre o implementado e o layout no figma.
+
+####
+8 - 
+####
+Vamos corrigir tamanhos de fontes hexadecimais direto em classes tailwind.
+
+- para tamanhos, use os tokens de tamanhos mais próximos ao invés de customizar.
+- para cores, extenda o thema do tailwind e configure a paleta de cor do projeto.
+
+####
+9
+####
+Precisamos configurar testes de acessibilidade - precisamos garantir o segundo nivel do wcag.
+inicialmente faça apenas os testes automatizados para levantar os problemas.
+
+
+BACKEND:
+
+###
+1
+###
+hora de implementar o backend, serão 3 endpoints:
+
+um para cadastrar um usuário (nome, e-mail e senha)
+um para efetuar login (JWT)
+um para obter dados do usuário logado (auth guard implementado usando o padrão da doc do nest.js)
+
+obs:
+
+vamos precisar do Swagger (inputs e outputs)
+inicialmente, vamos fazer apenas em memória. nada de orm ou banco de dados, apenas um array em memória mesmo.
+
+####
+2
+###
+@apps/api/src/users/users.service.ts  possui uma lista de usuarios em memória.
+
+o que precisamos:
+
+de um banco de dados para persistir esses dados - use o postgres
+escolha o ORM mais adequado e justifique a sua escolha (aponte outras ORMS que foram consideradas)
+
+atenção:  para o postgres, crie um dock compose na raiz do projeto, montando o volume para mantermos os dados persistidos.
+
+###
+###
+@apps/api/package.json é o nosso backend.
+
+temos swagger e endpoints de autenticação.
+
+precisamos integrar o frontend /web com esse backend, use axios para isso
+
+###
+página de feed
+###
+https://www.figma.com/design/GOfVtO37na1LQi29MopDox/CodeConnect---Acervo---Fa%C3%A7a-uma-c%C3%B3pia---Community-?node-id=155-3099&t=NL5ZCKG12Q85sWCm-4
+
+implemente essa página de feed de posts.
+crie os modelos no backend e migrations necessárias.
+
+implemente um seed gerando posts mockados e implemente uma solução para quando um thumbmail de um post não exista, tipo um placeholder.
+
+frontend: Atenção - siga as regras atuais, reaproveite componentes já existentes se possível. Usuários não logados podem ver o feed, mas não podem comentar nem curtir um post. Usuário logados, podem criar posts, curtir e comentar livremente.
+A página de feed e detalhes de um post possuem elementos parecidos, use layouts para reaproveita-los.
+No menu lateral a gente possui um link que muda de acordo com o status do usuário logado: login / sair dependendo do estado da sessão atual.
+A parte de filtro é um full text search e funciona no lado do backend.
+
+
+
