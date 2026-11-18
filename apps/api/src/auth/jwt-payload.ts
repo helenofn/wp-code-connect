@@ -8,3 +8,8 @@ export interface JwtPayload {
 export interface AuthenticatedRequest extends Request {
   user: JwtPayload;
 }
+
+/** Request behind `OptionalAuthGuard`: `user` is set only for a valid token. */
+export interface OptionalAuthRequest extends Request {
+  user?: JwtPayload;
+}

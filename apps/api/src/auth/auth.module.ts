@@ -4,6 +4,7 @@ import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 import type { Env } from '../env.schema.js';
 import { UsersModule } from '../users/users.module.js';
 import { AuthGuard } from './auth.guard.js';
+import { OptionalAuthGuard } from './optional-auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 
@@ -23,6 +24,8 @@ type ExpiresIn = NonNullable<JwtModuleOptions['signOptions']>['expiresIn'];
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
+  providers: [AuthService, AuthGuard, OptionalAuthGuard],
+  // Other modules guard their routes with these, so they need JwtService too.
+  exports: [AuthGuard, OptionalAuthGuard, JwtModule],
 })
 export class AuthModule {}

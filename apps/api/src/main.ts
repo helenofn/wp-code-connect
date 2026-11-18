@@ -10,7 +10,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Code Connect API')
-    .setDescription('Signup, JWT sign-in and the signed-in user')
+    .setDescription(
+      'Users, JWT sign-in, posts with full-text search, likes and comments',
+    )
     .setVersion('0.0.1')
     .addBearerAuth()
     .build();

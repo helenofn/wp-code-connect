@@ -3,8 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { CommentsModule } from './comments/comments.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { envSchema } from './env.schema.js';
+import { PostsModule } from './posts/posts.module.js';
 import { UsersModule } from './users/users.module.js';
 
 @Module({
@@ -13,6 +15,8 @@ import { UsersModule } from './users/users.module.js';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
