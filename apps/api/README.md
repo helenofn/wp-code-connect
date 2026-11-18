@@ -31,6 +31,15 @@
 $ pnpm install
 ```
 
+The app reads its configuration from `apps/api/.env` and won't start without `JWT_SECRET`. The `.env` file is gitignored, so create it from the example and set a random secret:
+
+```bash
+$ cp .env.example .env
+$ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"   # paste into JWT_SECRET
+```
+
+The e2e tests don't need `.env`, because `vitest.config.e2e.ts` sets its own `JWT_SECRET`.
+
 ## Compile and run the project
 
 ```bash
