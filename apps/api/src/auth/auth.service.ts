@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
 
   async signIn(email: string, password: string): Promise<TokenResponse> {
-    const user = this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
     // Same error for an unknown email and a wrong password, so the response
     // doesn't reveal which emails are registered.
     if (!user || !(await verifyPassword(password, user.passwordHash))) {

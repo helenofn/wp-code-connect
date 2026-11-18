@@ -48,8 +48,8 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserResponse, description: 'The signed-in user' })
   @ApiUnauthorizedResponse({ description: 'Missing, invalid or expired token' })
-  me(@Req() request: AuthenticatedRequest): UserResponse {
-    const user = this.usersService.findById(request.user.sub);
+  async me(@Req() request: AuthenticatedRequest): Promise<UserResponse> {
+    const user = await this.usersService.findById(request.user.sub);
     if (!user) {
       throw new UnauthorizedException();
     }

@@ -9,18 +9,18 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async create({ name, email, password }: CreateUserDto): Promise<UserRecord> {
-    if (this.usersRepository.findByEmail(email)) {
+    if (await this.usersRepository.findByEmail(email)) {
       throw new ConflictException('Email already registered');
     }
     const passwordHash = await hashPassword(password);
     return this.usersRepository.create({ name, email, passwordHash });
   }
 
-  findByEmail(email: string): UserRecord | undefined {
+  findByEmail(email: string): Promise<UserRecord | undefined> {
     return this.usersRepository.findByEmail(email);
   }
 
-  findById(id: string): UserRecord | undefined {
+  findById(id: string): Promise<UserRecord | undefined> {
     return this.usersRepository.findById(id);
   }
 

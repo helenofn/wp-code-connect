@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: code-connect-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-codeconnect}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codeconnect}
+      POSTGRES_DB: ${POSTGRES_DB:-code_connect}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      # Named volume: data survives `docker compose down` (only `down -v` deletes it).
+      - postgres-data:/var/lib/postgresql/data
+      # Scripts here run once, when the volume is first initialized.
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

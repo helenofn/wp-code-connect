@@ -27,7 +27,7 @@ describe('AuthService', () => {
   beforeEach(() => {
     usersService = {
       findByEmail: vi.fn((email: string) =>
-        email === user.email ? user : undefined,
+        Promise.resolve(email === user.email ? user : undefined),
       ),
     };
     jwtService = {

@@ -13,6 +13,9 @@
     "lint": "pnpm -r run lint",
     "test:api": "pnpm --filter api test",
     "test:web": "pnpm --filter web test",
-    "test:a11y": "pnpm --filter web test:a11y"
+    "test:a11y": "pnpm --filter web test:a11y",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter api db:migrate"
   }
 }

@@ -1,10 +1,36 @@
 import { ConflictException } from '@nestjs/common';
 import { verifyPassword } from './password.js';
-import { UsersRepository } from './users.repository.js';
+import type {
+  NewUserRecord,
+  UserRecord,
+  UsersRepository,
+} from './users.repository.js';
 import { UsersService } from './users.service.js';
 
+/** In-memory stand-in for the Postgres-backed repository. */
+function createFakeRepository() {
+  const rows: UserRecord[] = [];
+  return {
+    create: vi.fn((data: NewUserRecord) => {
+      const user: UserRecord = {
+        ...data,
+        id: crypto.randomUUID(),
+        createdAt: new Date(),
+      };
+      rows.push(user);
+      return Promise.resolve(user);
+    }),
+    findByEmail: vi.fn((email: string) =>
+      Promise.resolve(rows.find((user) => user.email === email)),
+    ),
+    findById: vi.fn((id: string) =>
+      Promise.resolve(rows.find((user) => user.id === id)),
+    ),
+  };
+}
+
 describe('UsersService', () => {
-  let repository: UsersRepository;
+  let repository: ReturnType<typeof createFakeRepository>;
   let service: UsersService;
 
   const dto = {
@@ -14,8 +40,8 @@ describe('UsersService', () => {
   };
 
   beforeEach(() => {
-    repository = new UsersRepository();
-    service = new UsersService(repository);
+    repository = createFakeRepository();
+    service = new UsersService(repository as unknown as UsersRepository);
   });
 
   it('creates a user with a hashed password', async () => {
@@ -28,8 +54,8 @@ describe('UsersService', () => {
     await expect(verifyPassword(dto.password, user.passwordHash)).resolves.toBe(
       true,
     );
-    expect(service.findById(user.id)).toBe(user);
-    expect(service.findByEmail(dto.email)).toBe(user);
+    await expect(service.findById(user.id)).resolves.toBe(user);
+    await expect(service.findByEmail(dto.email)).resolves.toBe(user);
   });
 
   it('throws 409 when the email is already registered', async () => {
@@ -42,10 +68,10 @@ describe('UsersService', () => {
 
   it('does not hash the password when the email is taken', async () => {
     await service.create(dto);
-    const create = vi.spyOn(repository, 'create');
+    repository.create.mockClear();
 
     await expect(service.create(dto)).rejects.toThrow(ConflictException);
-    expect(create).not.toHaveBeenCalled();
+    expect(repository.create).not.toHaveBeenCalled();
   });
 
   it('leaves the password hash out of the response', async () => {

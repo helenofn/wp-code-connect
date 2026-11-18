@@ -1,34 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { InjectDrizzle } from '@nestjs/drizzle';
+import { eq } from 'drizzle-orm';
+import type { Database } from '../database/database.module.js';
+import { users } from '../database/schema.js';
 
-export interface UserRecord {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-}
+export type UserRecord = typeof users.$inferSelect;
+export type NewUserRecord = Omit<typeof users.$inferInsert, 'id' | 'createdAt'>;
 
-/** In-memory storage. Data is lost when the process restarts. */
+const UNIQUE_VIOLATION = '23505';
+
 @Injectable()
 export class UsersRepository {
-  private readonly users: UserRecord[] = [];
+  constructor(@InjectDrizzle() private readonly db: Database) {}
 
-  create(data: Omit<UserRecord, 'id' | 'createdAt'>): UserRecord {
-    const user: UserRecord = {
-      ...data,
-      id: randomUUID(),
-      createdAt: new Date(),
-    };
-    this.users.push(user);
+  async create(data: NewUserRecord): Promise<UserRecord> {
+    try {
+      const [user] = await this.db.insert(users).values(data).returning();
+      return user!;
+    } catch (error) {
+      // Covers the race between the service's email check and this insert.
+      if (isUniqueViolation(error)) {
+        throw new ConflictException('Email already registered');
+      }
+      throw error;
+    }
+  }
+
+  async findByEmail(email: string): Promise<UserRecord | undefined> {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
     return user;
   }
 
-  findByEmail(email: string): UserRecord | undefined {
-    return this.users.find((user) => user.email === email);
+  async findById(id: string): Promise<UserRecord | undefined> {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+    return user;
   }
+}
 
-  findById(id: string): UserRecord | undefined {
-    return this.users.find((user) => user.id === id);
+/** Drizzle wraps driver errors, so the pg error may be the `cause`. */
+function isUniqueViolation(error: unknown): boolean {
+  for (let e = error; e instanceof Error; e = e.cause) {
+    if ((e as { code?: unknown }).code === UNIQUE_VIOLATION) return true;
   }
+  return false;
 }

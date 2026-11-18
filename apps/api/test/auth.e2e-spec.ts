@@ -2,10 +2,14 @@ import {
   StandardSchemaValidationPipe,
   type INestApplication,
 } from '@nestjs/common';
+import { getDrizzleToken } from '@nestjs/drizzle';
 import { Test, TestingModule } from '@nestjs/testing';
+import { sql } from 'drizzle-orm';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from './../src/app.module.js';
+import type { Database } from './../src/database/database.module.js';
+import { users } from './../src/database/schema.js';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication<App>;
@@ -24,6 +28,9 @@ describe('Auth (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new StandardSchemaValidationPipe());
     await app.init();
+
+    // Each test starts from an empty table.
+    await app.get<Database>(getDrizzleToken()).execute(sql`TRUNCATE ${users}`);
   });
 
   afterEach(async () => {

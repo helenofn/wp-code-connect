@@ -26,7 +26,23 @@ pnpm api <script> [args]    # e.g. pnpm api test:e2e, pnpm api test:cov, pnpm ap
 pnpm web <script> [args]    # e.g. pnpm web preview
 ```
 
-The api needs `apps/api/.env` to start. Copy `apps/api/.env.example` and set `JWT_SECRET`. The file is gitignored, and the `ConfigModule` env validation fails at boot without it.
+The api needs `apps/api/.env` to start. Copy `apps/api/.env.example` and set `JWT_SECRET` and `DATABASE_URL`. The file is gitignored, and the `ConfigModule` env validation fails at boot without it.
+
+## Database (PostgreSQL + Drizzle)
+
+Postgres runs from the root `docker-compose.yml`. Its data lives in the named volume `postgres-data`, so it survives `docker compose down`, and only `down -v` deletes it. On first start, `docker/postgres/init/` also creates `code_connect_test`, the database the e2e tests use.
+
+```bash
+pnpm db:up              # start postgres and wait until it's healthy
+pnpm db:migrate         # apply pending migrations (apps/api/drizzle/)
+pnpm db:down            # stop it; data is kept
+pnpm api db:generate --name <change>   # create a migration after editing the schema
+pnpm api db:studio      # browse the data
+```
+
+- The ORM is **Drizzle** via first-party `@nestjs/drizzle` (`src/database/database.module.ts`). Tables live in `src/database/schema.ts`, with explicit snake_case column names and camelCase properties. Inject the db with `@InjectDrizzle()`, typed as `Database`.
+- Never edit an applied migration: change `schema.ts` and generate a new one. Migrations are committed.
+- The e2e tests need postgres running. Their `globalSetup` migrates `code_connect_test`, and each spec truncates its tables in `beforeEach`. Unit tests don't touch the database, so they fake the repository.
 
 Single test file / test name (api):
 
