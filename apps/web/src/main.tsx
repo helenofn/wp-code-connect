@@ -5,6 +5,8 @@ import { createRoot } from 'react-dom/client'
 import '@fontsource/prompt/400.css'
 import '@fontsource/prompt/500.css'
 import '@fontsource/prompt/600.css'
+// Roboto Mono só para os blocos de código.
+import '@fontsource/roboto-mono/400.css'
 import './index.css'
 import App from './App.tsx'
 

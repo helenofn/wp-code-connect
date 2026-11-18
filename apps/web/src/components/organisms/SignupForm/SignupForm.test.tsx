@@ -9,6 +9,7 @@ describe('SignupForm', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Cadastro' })).toBeInTheDocument()
     expect(screen.getByLabelText('Nome')).toBeInTheDocument()
     expect(screen.getByLabelText('Email')).toBeInTheDocument()
+    expect(screen.getByLabelText('Usuário')).toBeInTheDocument()
     expect(screen.getByLabelText('Senha')).toBeInTheDocument()
   })
 
@@ -19,6 +20,7 @@ describe('SignupForm', () => {
 
     await user.type(screen.getByLabelText('Nome'), 'Ana Souza')
     await user.type(screen.getByLabelText('Email'), 'ana@example.com')
+    await user.type(screen.getByLabelText('Usuário'), 'ana_souza')
     await user.type(screen.getByLabelText('Senha'), 'segredo')
     await user.click(screen.getByRole('checkbox', { name: 'Lembrar-me' }))
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }))
@@ -26,6 +28,7 @@ describe('SignupForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({
       name: 'Ana Souza',
       email: 'ana@example.com',
+      username: 'ana_souza',
       password: 'segredo',
       remember: true,
     })

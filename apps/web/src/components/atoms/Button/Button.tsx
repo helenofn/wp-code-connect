@@ -1,13 +1,16 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary'
+  variant?: 'primary' | 'outline' | 'outline-dark'
   icon?: ReactNode
   children: ReactNode
 }
 
 const variants = {
   primary: 'bg-verde-destaque text-verde-petroleo hover:brightness-95',
+  outline: 'border border-verde-destaque text-verde-destaque hover:bg-verde-destaque/10',
+  // Para fundos claros (ex.: a seção de comentários).
+  'outline-dark': 'border border-cinza-escuro text-cinza-escuro hover:bg-cinza-escuro/10',
 }
 
 export function Button({

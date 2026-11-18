@@ -1,22 +1,21 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
-import { login } from '../services/api/auth'
+import { getMe, login } from '../services/api/auth'
 import { clearToken, getToken } from '../services/api/tokenStorage'
 import { httpError } from '../test/http'
+import { ana, renderApp } from '../test/render'
 import { LoginPage } from './LoginPage'
 
 vi.mock('../services/api/auth')
 
 function renderPage() {
-  render(
-    <MemoryRouter initialEntries={['/login']}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/inicio" element={<p>Página inicial</p>} />
-      </Routes>
-    </MemoryRouter>,
-  )
+  renderApp({
+    path: '/login',
+    routes: [
+      { path: '/login', element: <LoginPage /> },
+      { path: '/', element: <p>Feed</p> },
+    ],
+  })
 }
 
 async function submit(email: string, password: string) {
@@ -44,14 +43,15 @@ describe('LoginPage', () => {
     )
   })
 
-  it('signs in, saves the token and goes to the home page', async () => {
+  it('signs in, saves the token and goes to the feed', async () => {
     vi.mocked(login).mockResolvedValue({ accessToken: 'jwt', tokenType: 'Bearer', expiresIn: 3600 })
+    vi.mocked(getMe).mockResolvedValue(ana)
     renderPage()
 
     await submit('ana@example.com', 'segredo123')
 
     expect(login).toHaveBeenCalledWith({ email: 'ana@example.com', password: 'segredo123' })
-    expect(await screen.findByText('Página inicial')).toBeInTheDocument()
+    expect(await screen.findByText('Feed')).toBeInTheDocument()
     expect(getToken()).toBe('jwt')
   })
 

@@ -4,6 +4,7 @@ export interface UserResponse {
   id: string
   name: string
   email: string
+  username: string
   createdAt: string
 }
 
@@ -16,6 +17,7 @@ export interface TokenResponse {
 export interface CreateUserInput {
   name: string
   email: string
+  username: string
   password: string
 }
 

@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { AuthFooterCta } from '../components/organisms/AuthFooterCta/AuthFooterCta'
 import { LoginForm, type LoginValues } from '../components/organisms/LoginForm/LoginForm'
 import { SocialLogin } from '../components/organisms/SocialLogin/SocialLogin'
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout'
 import { login } from '../services/api/auth'
 import { getErrorMessage } from '../services/api/errors'
-import { saveToken } from '../services/api/tokenStorage'
+import { useSession } from '../session/SessionContext'
 import { socialProviders } from './socialProviders'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { signIn } = useSession()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
 
@@ -19,8 +21,10 @@ export function LoginPage() {
     setError(undefined)
     try {
       const { accessToken } = await login({ email, password })
-      saveToken(accessToken, remember)
-      navigate('/inicio')
+      await signIn(accessToken, remember)
+      // Volta para a tela que pediu o login (ex.: Publicar) ou vai para o feed.
+      const from = (location.state as { from?: string } | null)?.from
+      navigate(from ?? '/', { replace: true })
     } catch (err) {
       setError(getErrorMessage(err))
       setSubmitting(false)

@@ -9,6 +9,11 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument()
   })
 
+  it('renders the outline variant as a regular button', () => {
+    render(<Button variant="outline">Descartar</Button>)
+    expect(screen.getByRole('button', { name: 'Descartar' })).toHaveAttribute('type', 'button')
+  })
+
   it('calls onClick when pressed', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()

@@ -6,23 +6,24 @@ import { SocialLogin } from '../components/organisms/SocialLogin/SocialLogin'
 import { AuthLayout } from '../components/templates/AuthLayout/AuthLayout'
 import { createUser, login } from '../services/api/auth'
 import { getErrorMessage } from '../services/api/errors'
-import { saveToken } from '../services/api/tokenStorage'
+import { useSession } from '../session/SessionContext'
 import { socialProviders } from './socialProviders'
 
 export function SignupPage() {
   const navigate = useNavigate()
+  const { signIn } = useSession()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
 
-  async function handleSignup({ name, email, password, remember }: SignupValues) {
+  async function handleSignup({ name, email, username, password, remember }: SignupValues) {
     setSubmitting(true)
     setError(undefined)
     try {
-      await createUser({ name, email, password })
+      await createUser({ name, email, username, password })
       // Cadastro feito: entra direto, sem pedir os dados de novo.
       const { accessToken } = await login({ email, password })
-      saveToken(accessToken, remember)
-      navigate('/inicio')
+      await signIn(accessToken, remember)
+      navigate('/', { replace: true })
     } catch (err) {
       setError(getErrorMessage(err))
       setSubmitting(false)
