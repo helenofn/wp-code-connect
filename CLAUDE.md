@@ -26,6 +26,8 @@ pnpm api <script> [args]    # e.g. pnpm api test:e2e, pnpm api test:cov, pnpm ap
 pnpm web <script> [args]    # e.g. pnpm web preview
 ```
 
+The api needs `apps/api/.env` to start. Copy `apps/api/.env.example` and set `JWT_SECRET`. The file is gitignored, and the `ConfigModule` env validation fails at boot without it.
+
 Single test file / test name (api):
 
 ```bash
