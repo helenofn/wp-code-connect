@@ -14,6 +14,7 @@ describe('UsersRepository (e2e)', () => {
   const data = {
     name: 'Ada Lovelace',
     email: 'ada@example.com',
+    username: 'ada',
     passwordHash: 'hash',
   };
 
@@ -25,7 +26,7 @@ describe('UsersRepository (e2e)', () => {
     repository = moduleFixture.get(UsersRepository);
     await moduleFixture
       .get<Database>(getDrizzleToken())
-      .execute(sql`TRUNCATE ${users}`);
+      .execute(sql`TRUNCATE ${users} CASCADE`);
   });
 
   afterEach(async () => {
@@ -56,8 +57,22 @@ describe('UsersRepository (e2e)', () => {
   it('turns a duplicate email into a 409 at the database level', async () => {
     await repository.create(data);
 
-    await expect(repository.create(data)).rejects.toThrow(
-      new ConflictException('Email already registered'),
-    );
+    await expect(
+      repository.create({ ...data, username: 'other' }),
+    ).rejects.toThrow(new ConflictException('Email already registered'));
+  });
+
+  it('turns a duplicate username into a 409 at the database level', async () => {
+    await repository.create(data);
+
+    await expect(
+      repository.create({ ...data, email: 'other@example.com' }),
+    ).rejects.toThrow(new ConflictException('Username already taken'));
+  });
+
+  it('finds a user by username', async () => {
+    const user = await repository.create(data);
+
+    await expect(repository.findByUsername('ada')).resolves.toEqual(user);
   });
 });

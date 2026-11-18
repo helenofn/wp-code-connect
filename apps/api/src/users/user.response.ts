@@ -10,6 +10,9 @@ export class UserResponse {
   @ApiProperty({ format: 'email', example: 'ada@example.com' })
   email: string;
 
+  @ApiProperty({ example: 'ada' })
+  username: string;
+
   @ApiProperty({ type: String, format: 'date-time' })
   createdAt: Date;
 }

@@ -17,6 +17,7 @@ describe('Auth (e2e)', () => {
   const newUser = {
     name: 'Ada Lovelace',
     email: 'Ada@Example.com',
+    username: 'Ada.Lovelace',
     password: 's3cret-pass',
   };
 
@@ -30,7 +31,9 @@ describe('Auth (e2e)', () => {
     await app.init();
 
     // Each test starts from an empty table.
-    await app.get<Database>(getDrizzleToken()).execute(sql`TRUNCATE ${users}`);
+    await app
+      .get<Database>(getDrizzleToken())
+      .execute(sql`TRUNCATE ${users} CASCADE`);
   });
 
   afterEach(async () => {
@@ -51,6 +54,7 @@ describe('Auth (e2e)', () => {
         id: expect.any(String),
         name: 'Ada Lovelace',
         email: 'ada@example.com',
+        username: 'ada.lovelace',
         createdAt: expect.any(String),
       });
       expect(res.headers.location).toBe(`/users/${res.body.id}`);
@@ -72,10 +76,23 @@ describe('Auth (e2e)', () => {
       });
     });
 
+    it('returns 409 when the username is already taken', async () => {
+      await signUp().expect(201);
+
+      const res = await signUp({
+        ...newUser,
+        email: 'other@example.com',
+        username: 'ada.lovelace',
+      }).expect(409);
+
+      expect(res.body.message).toBe('Username already taken');
+    });
+
     it('returns 400 for an invalid body', async () => {
       const res = await signUp({
         name: '   ',
         email: 'not-an-email',
+        username: 'a b',
         password: 'short',
       }).expect(400);
 

@@ -19,6 +19,7 @@ describe('AuthService', () => {
       id: 'user-1',
       name: 'Ada Lovelace',
       email: 'ada@example.com',
+      username: 'ada',
       passwordHash: await hashPassword('s3cret-pass'),
       createdAt: new Date(),
     };

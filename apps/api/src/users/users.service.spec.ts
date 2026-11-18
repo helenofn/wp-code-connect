@@ -23,6 +23,9 @@ function createFakeRepository() {
     findByEmail: vi.fn((email: string) =>
       Promise.resolve(rows.find((user) => user.email === email)),
     ),
+    findByUsername: vi.fn((username: string) =>
+      Promise.resolve(rows.find((user) => user.username === username)),
+    ),
     findById: vi.fn((id: string) =>
       Promise.resolve(rows.find((user) => user.id === id)),
     ),
@@ -36,6 +39,7 @@ describe('UsersService', () => {
   const dto = {
     name: 'Ada Lovelace',
     email: 'ada@example.com',
+    username: 'ada',
     password: 's3cret-pass',
   };
 
@@ -47,7 +51,11 @@ describe('UsersService', () => {
   it('creates a user with a hashed password', async () => {
     const user = await service.create(dto);
 
-    expect(user).toMatchObject({ name: dto.name, email: dto.email });
+    expect(user).toMatchObject({
+      name: dto.name,
+      email: dto.email,
+      username: dto.username,
+    });
     expect(user.id).toEqual(expect.any(String));
     expect(user.createdAt).toBeInstanceOf(Date);
     expect(user.passwordHash).not.toBe(dto.password);
@@ -64,6 +72,14 @@ describe('UsersService', () => {
     await expect(service.create({ ...dto, name: 'Other' })).rejects.toThrow(
       ConflictException,
     );
+  });
+
+  it('throws 409 when the username is already taken', async () => {
+    await service.create(dto);
+
+    await expect(
+      service.create({ ...dto, email: 'other@example.com' }),
+    ).rejects.toThrow(new ConflictException('Username already taken'));
   });
 
   it('does not hash the password when the email is taken', async () => {
@@ -83,6 +99,7 @@ describe('UsersService', () => {
       id: user.id,
       name: dto.name,
       email: dto.email,
+      username: dto.username,
       createdAt: user.createdAt,
     });
     expect(response).not.toHaveProperty('passwordHash');

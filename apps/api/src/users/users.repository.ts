@@ -2,12 +2,14 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectDrizzle } from '@nestjs/drizzle';
 import { eq } from 'drizzle-orm';
 import type { Database } from '../database/database.module.js';
+import { uniqueViolation } from '../database/errors.js';
 import { users } from '../database/schema.js';
 
 export type UserRecord = typeof users.$inferSelect;
 export type NewUserRecord = Omit<typeof users.$inferInsert, 'id' | 'createdAt'>;
 
-const UNIQUE_VIOLATION = '23505';
+export const EMAIL_TAKEN = 'Email already registered';
+export const USERNAME_TAKEN = 'Username already taken';
 
 @Injectable()
 export class UsersRepository {
@@ -18,9 +20,12 @@ export class UsersRepository {
       const [user] = await this.db.insert(users).values(data).returning();
       return user!;
     } catch (error) {
-      // Covers the race between the service's email check and this insert.
-      if (isUniqueViolation(error)) {
-        throw new ConflictException('Email already registered');
+      // Covers the race between the service's checks and this insert.
+      const constraint = uniqueViolation(error);
+      if (constraint !== undefined) {
+        throw new ConflictException(
+          constraint.includes('username') ? USERNAME_TAKEN : EMAIL_TAKEN,
+        );
       }
       throw error;
     }
@@ -35,6 +40,15 @@ export class UsersRepository {
     return user;
   }
 
+  async findByUsername(username: string): Promise<UserRecord | undefined> {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+    return user;
+  }
+
   async findById(id: string): Promise<UserRecord | undefined> {
     const [user] = await this.db
       .select()
@@ -43,12 +57,4 @@ export class UsersRepository {
       .limit(1);
     return user;
   }
-}
-
-/** Drizzle wraps driver errors, so the pg error may be the `cause`. */
-function isUniqueViolation(error: unknown): boolean {
-  for (let e = error; e instanceof Error; e = e.cause) {
-    if ((e as { code?: unknown }).code === UNIQUE_VIOLATION) return true;
-  }
-  return false;
 }
